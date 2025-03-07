@@ -4,3 +4,6 @@
 [submodule "modules/terraform-aws-iam"]
 	path = modules/terraform-aws-iam
 	url = git@github.com:mikamakusa/terraform-aws-iam.git
+[submodule "modules/terraform-aws-glue"]
+	path = modules/terraform-aws-glue
+	url = git@github.com:mikamakusa/terraform-aws-glue.git
