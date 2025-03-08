@@ -1,3 +1,63 @@
+variable "data_cells_filter" {
+  type = list(object({
+    id = any
+    table_data = list(object({
+      database_id    = any
+      name             = string
+      table_id       = any
+      column_names = optional(list(string))
+      version_id = optional(string)
+      column_wildcard = optional(list(object({
+        excluded_column_names = optional(list(string))
+      })), [])
+      row_filter = optional(list(object({
+        filter_expression = optional(string)
+      })), [])
+    }))
+  }))
+  default = []
+  description = <<EOT
+Terraform resource for managing an AWS Lake Formation Data Cells Filter.
+EOT
+}
+
+variable "data_lake_settings" {
+  type = list(object({
+    id = number
+    admins = optional(list(string))
+    allow_external_data_filtering = optional(bool)
+    allow_full_table_external_data_access = optional(bool)
+    authorized_session_tag_value_list = optional(list(string))
+    catalog_id = optional(string)
+    external_data_filtering_allow_list = optional(list(string))
+    trusted_resource_owners = optional(list(string))
+    parameters = optional(map(string))
+    read_only_admins = optional(list(string))
+    create_database_default_permissions = optional(list(object({
+      permissions = optional(list(string))
+      principal = optional(string)
+    })), [])
+    create_table_default_permissions = optional(list(object({
+      permissions = optional(list(string))
+      principal = optional(string)
+    })), [])
+  }))
+  default = []
+  description = <<EOT
+Manages Lake Formation principals designated as data lake administrators and lists of principal permission entries for default create database and default create table permissions.
+EOT
+
+  validation {
+    condition = length([for a in var.data_lake_settings: true if contains(["ALL", "SELECT", "ALTER", "DROP", "DELETE", "INSERT", "DESCRIBE", "CREATE_TABLE"], a.create_database_default_permissions.permissions)]) == length(var.data_lake_settings)
+    error_message = "Valid values are : ALL, SELECT, ALTER, DROP, DELETE, INSERT, DESCRIBE, and CREATE_TABLE."
+  }
+
+  validation {
+    condition = length([for b in var.data_lake_settings: true if contains(["ALL", "SELECT", "ALTER", "DROP", "DELETE", "INSERT", "DESCRIBE", "CREATE_TABLE"], b.create_table_default_permissions.permissions)]) == length(var.data_lake_settings)
+    error_message = "Valid values are : ALL, SELECT, ALTER, DROP, DELETE, INSERT, DESCRIBE, and CREATE_TABLE."
+  }
+}
+
 variable "resource" {
   type = list(object({
     id = any
